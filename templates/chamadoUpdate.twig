@@ -1,0 +1,204 @@
+{% extends 'base.twig' %}
+
+
+
+{% block content %}
+    {% include 'menu.twig' %}
+    <div class="container" style="text-align: left">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="mb-3">{{ title }}</h4>
+                <form class="needs-validation">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="abertoPor">Chamado Aberto por</label>
+                            <input type="text" class="form-control" placeholder=""
+                                   value="{{ operador.nome }}" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="status">Status</label>
+                            <select id="status" class="form-control">
+                                <option value="" disabled>Selecione</option>
+                                {% for st in status %}
+                                    <option value="{{ st.id }}"
+                                            {% if st.id == chamado.StatusChamado_id %}
+                                    selected
+                                            {% endif %}>{{ st.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="canal">Canal de atendimento</label>
+                            <select id="canalAtendimento" class="form-control">
+                                <option value="" disabled>Selecione</option>
+                                {% for canal in canais %}
+                                    <option value="{{ canal.id }}"
+                                            {% if canal.id == chamado.CanaisAtendimentoChamado_id %}
+                                    selected
+                                            {% endif %}>{{ canal.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="modulo">Módulo</label>
+                            <select id="modulo" class="form-control">
+                                <option value="" disabled>Selecione</option>
+                                {% for modulo in modulos %}
+                                    <option value="{{ modulo.id }}"
+                                            {% if modulo.id == chamado.ModulosChamado_id %}
+                                    selected
+                                            {% endif %}>{{ modulo.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="tipo">Tipo</label>
+                            <select id="tipo" class="form-control">
+                                <option value="" disabled>Selecione</option>
+                                {% for tipo in tipos %}
+                                    <option value="{{ tipo.id }}"
+                                            {% if tipo.id == chamado.TiposChamado_id %}
+                                    selected
+                                            {% endif %}>{{ tipo.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nomeSolicitante">Nome Solicitante</label>
+                            <input type="text" class="form-control" id="nomeSolicitante" placeholder=""
+                                   value="{{ chamado.nomeSolicitante }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="empresaSolicitante">Empresa do Solicitante</label>
+                            <input type="text" class="form-control" id="empresaSolicitante"
+                                   value="{{ chamado.empresaSolicitante }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label for="descricaoChamado">Descrição</label>
+                            <textarea class="form-control" id="descricaoChamado"
+                                      rows="3">{{ chamado.descricao }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label for="descricaoFechamentoChamado">Descrição fechamento chamado</label>
+                            <textarea class="form-control" id="descricaoFechamento"
+                                      rows="3">{{ chamado.descricaoResolucao }}</textarea>
+                        </div>
+                    </div>
+
+                    <div style="text-align: right">
+                        <button id="excluirChamado" style="margin-right: 250px" class="btn btn-danger" type="button">
+                            Excluir
+                        </button>
+                        <button id="cancelarChamado" class="btn btn-light" type="button">Voltar</button>
+                        <button id="salvarChamado" class="btn btn-primary" type="button">Atualizar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#cancelarChamado').click(function () {
+                Swal.fire({
+                    type: 'warning',
+                    title: 'Tem certeza?',
+                    text: 'Deseja cancelar este cadastro?',
+                    confirmButtonText: 'Sim',
+                    showCancelButton: true,
+                    cancelButtonText: 'Não tenho certeza'
+                }).then((result) => {
+                    if (result.value) {
+                        window.location = '/sistema/chamados';
+                    }
+                });
+            });
+
+            $('#salvarChamado').click(function () {
+                $.ajax({
+                    type: "PUT",
+                    url: '/sistema/chamados/{{ chamado.id }}',
+                    data: {
+                        status: $('#status').val(),
+                        canalAtendimento: $('#canalAtendimento').val(),
+                        modulo: $('#modulo').val(),
+                        tipoChamado: $('#tipo').val(),
+                        nomeSolicitante: $('#nomeSolicitante').val(),
+                        empresaSolicitante: $('#empresaSolicitante').val(),
+                        descricaoChamado: $('#descricaoChamado').val(),
+                        descricaoResolucao: $('#descricaoFechamento').val()
+                    }
+                }).done(function (data) {
+                    if (data.success) {
+                        Swal.fire({
+                            type: 'success',
+                            title: data.message
+                        }).then((result) => {
+                            if (result.value) {
+                                window.location = '/sistema/chamados';
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Oops...',
+                            text: data.message
+                        });
+                    }
+                });
+            });
+
+            $('#excluirChamado').click(function () {
+                Swal.fire({
+                    type: 'warning',
+                    title: 'Tem certeza?',
+                    text: 'Deseja excluir este chamado?',
+                    confirmButtonText: 'Sim',
+                    showCancelButton: true,
+                    cancelButtonText: 'Não tenho certeza'
+                }).then((result) => {
+                    if (result.value) {
+                        $.ajax({
+                            type: "DELETE",
+                            url: '/sistema/chamados/{{ chamado.id }}'
+                        }).done(function (data) {
+                            if (data.success) {
+                                Swal.fire({
+                                    type: 'success',
+                                    title: data.message
+                                }).then((result) => {
+                                    if (result.value) {
+                                        window.location = '/sistema/chamados';
+                                    }
+                                });
+                            } else {
+                                Swal.fire({
+                                    type: 'error',
+                                    title: 'Oops...',
+                                    text: data.message
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

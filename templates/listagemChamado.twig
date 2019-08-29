@@ -1,0 +1,41 @@
+{% extends 'base.twig' %}
+
+{% block title %} Listagem de Chamados {% endblock %}
+{% block content %}
+
+    {% include 'menu.twig' %}
+
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">Chamados</h1>
+        <a href="/sistema/chamados/novo" type="button" class="btn btn-secondary">
+            Novo chamado
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="card-deck mb-3 text-center">
+            <table class="table" style="text-align: left">
+                <thead>
+                <tr>
+                    <th scope="col">Data abertura</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Solicitante</th>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for chamado in chamados %}
+                <tr>
+                    <td>{{ chamado.dataAbertura|date('d/m/Y') }}</td>
+                    <td>{{ chamado.status }}</td>
+                    <td>{{ chamado.nomeSolicitante }}</td>
+                    <td>{{ chamado.empresaSolicitante }}</td>
+                    <td><a href="/sistema/chamados/{{ chamado.id }}" type="button" class="btn btn-primary btn-sm">Editar</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends "base.twig" %}
+
+{% block title %} Login {% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    <style>
+
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-align: center;
+            align-items: center;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+        }
+
+        .form-signin {
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin: auto;
+        }
+
+        .form-signin .checkbox {
+            font-weight: 400;
+        }
+
+        .form-signin .form-control {
+            position: relative;
+            box-sizing: border-box;
+            height: auto;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .form-signin .form-control:focus {
+            z-index: 2;
+        }
+
+        .form-signin input[type="email"] {
+            margin-bottom: -1px;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .form-signin input[type="password"] {
+            margin-bottom: 10px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+    <form class="form-signin" action="/auth" method="post">
+        {#<img class="mb-4" src="/docs/4.3/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">#}
+        <h1 class="h3 mb-3 font-weight-normal">Acessar conta</h1>
+        <p style="color: red">{{ message }}</p>
+        <label for="inputEmail" class="sr-only">E-mail</label>
+        <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Endereço de e-mail" required
+               autofocus>
+        <label for="inputPassword" class="sr-only">Senha</label>
+        <input name="senha" type="password" id="inputPassword" class="form-control" placeholder="Senha" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Entrar</button>
+        <br>
+        <br>
+        <br>
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#cadastroUsuarioModal">
+            Sou novo por aqui :)
+        </button>
+    </form>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="cadastroUsuarioModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Cadastrar Usuário</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form style="text-align: left">
+                        <div class="form-group">
+                            <label for="nome">Nome</label>
+                            <input type="text" class="form-control" id="nomeUsuario" placeholder="Nome" name="nome">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">e-mail</label>
+                            <input type="text" class="form-control" id="emailUsuario" placeholder="e-mail">
+                        </div>
+                        <div class="form-group">
+                            <label for="senha">Senha</label>
+                            <input type="password" class="form-control" id="senhaUsuario" placeholder="senha">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="cadastrarUsuario" type="button" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+
+            $('#cadastrarUsuario').click(function () {
+                console.log('entrei');
+                $.ajax({
+                    type: "POST",
+                    url: '/usuario',
+                    data: {
+                        nome: $('#nomeUsuario').val(),
+                        email: $('#emailUsuario').val(),
+                        senha: $('#senhaUsuario').val()
+                    }
+                }).done(function (data) {
+                    if (data.success) {
+                        Swal.fire({
+                            type: 'success',
+                            title: data.message
+                        }).then((result) => {
+                            if (result.value) {
+                                $('#cadastroUsuarioModal').modal('toggle');
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Oops...',
+                            text: data.message
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
